@@ -1,0 +1,6 @@
+data/oop.my.graphs.desktop.in
+data/oop.my.graphs.metainfo.xml.in
+data/oop.my.graphs.gschema.xml
+src/main.js
+src/window.js
+src/window.ui

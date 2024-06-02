@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.0"/>
+  <requires lib="Gdk" version="4.0"/>
+  <template class="Sidebar" parent="GtkBox">
+    <property name="orientation">horizontal</property>
+    <child>
+      <object class="GtkScrolledWindow">
+        <property name="hexpand">true</property>
+        <property name="min-content-width">0</property>
+        <property name="hscrollbar-policy">automatic</property>
+        <child>
+          <object class="GtkLabel">
+            <property name="label">Hello world!</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwBin" id="resize">
+        <property name="halign">end</property>
+        <property name="width-request">15</property>
+        <property name="cursor">
+          <object class="GdkCursor">
+            <property name="name">ew-resize</property>
+          </object>
+        </property>
+        <property name="child">
+          <object class="GtkSeparator">
+            <property name="halign">center</property>
+            <style>
+              <class name="horizontal"/>
+            </style>
+          </object>
+        </property>
+      </object>
+    </child>
+  </template>
+</interface>

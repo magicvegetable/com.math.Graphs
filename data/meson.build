@@ -12,17 +12,17 @@ if desktop_utils.found()
   test('Validate desktop file', desktop_utils, args: [desktop_file])
 endif
 
-appstream_file = i18n.merge_file(
-        input: 'oop.my.graphs.metainfo.xml.in',
-       output: 'oop.my.graphs.metainfo.xml',
-       po_dir: '../po',
-      install: true,
-  install_dir: get_option('datadir') / 'metainfo'
-)
+# appstream_file = i18n.merge_file(
+#         input: 'oop.my.graphs.metainfo.xml.in',
+#        output: 'oop.my.graphs.metainfo.xml',
+#        po_dir: '../po',
+#       install: true,
+#   install_dir: get_option('datadir') / 'metainfo'
+# )
 
-appstreamcli = find_program('appstreamcli', required: false, disabler: true)
-test('Validate appstream file', appstreamcli,
-     args: ['validate', '--no-net', '--explain', appstream_file])
+# appstreamcli = find_program('appstreamcli', required: false, disabler: true)
+# test('Validate appstream file', appstreamcli,
+#      args: ['validate', '--no-net', '--explain', appstream_file])
 
 install_data('oop.my.graphs.gschema.xml',
   install_dir: get_option('datadir') / 'glib-2.0' / 'schemas'

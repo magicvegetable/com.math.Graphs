@@ -1,0 +1,18 @@
+#ifndef APP_INIT
+#define APP_INIT
+
+#include <fontconfig/fontconfig.h>
+#include <stdlib.h>
+
+#define FONT_SRC_DIR "@FONT_SRC_DIR@"
+#define FONT_DEST_DIR "@FONT_DEST_DIR@"
+#define FONT_CONFIG_SRC_FILE "@FONT_CONFIG_SRC_FILE@"
+#define FONT_CONFIG_DEST_FILE "@FONT_CONFIG_DEST_FILE@"
+#define APP_EXEC "@APP_EXEC@"
+#define AMOUNT_OF_FONTS 8
+#define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof(arr[0]))
+
+int dest_dir_checked(FcConfig *config);
+int fonts_exist(FcConfig *config);
+
+#endif // !APP_INIT

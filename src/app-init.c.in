@@ -1,0 +1,84 @@
+#include <unistd.h>
+#include <stdio.h>
+#include <fontconfig/fontconfig.h>
+#include <stdlib.h>
+
+#define AFACAD_FONT (const FcChar8*)"@AFACAD_FONT@"
+#define APP_EXEC "@APP_EXEC@"
+
+int font_exist(FcConfig *config) {
+    FcPattern *pattern = FcPatternCreate();
+    FcObjectSet *os = FcObjectSetBuild(FC_FAMILY, FC_FILE, (char *)NULL);
+
+    FcPatternAddString(pattern, FC_FULLNAME, (const FcChar8*)"Afacad Regular");
+
+    FcFontSet *font_set = FcFontList(config, pattern, os);
+    int exist = 0;
+    if (font_set) {
+        exist = font_set->nfont;
+        // Clean up
+        FcFontSetDestroy(font_set);
+    } else {
+        fprintf(stderr, "Failed to list Afacad Regular font.\n");
+    }
+
+    // Clean up
+    FcPatternDestroy(pattern);
+    FcObjectSetDestroy(os);
+    return exist;
+}
+
+void print_font_info(FcPattern *font) {
+    FcChar8 *family, *file;
+    if (FcPatternGetString(font, FC_FAMILY, 0, &family) == FcResultMatch &&
+        FcPatternGetString(font, FC_FILE, 0, &file) == FcResultMatch) {
+        printf("Font Family: %s\n", family);
+        printf("Font File: %s\n", file);
+        printf("--------------------------\n");
+    }
+}
+
+void list(FcConfig *config) {
+    FcPattern *pattern = FcPatternCreate();
+    FcObjectSet *os = FcObjectSetBuild(FC_FAMILY, FC_FILE, (char *)NULL);
+
+    // List all fonts
+    FcFontSet *fontSet = FcFontList(config, pattern, os);
+    if (fontSet) {
+        for (int i = 0; i < fontSet->nfont; ++i) {
+            print_font_info(fontSet->fonts[i]);
+        }
+
+        // Clean up
+        FcFontSetDestroy(fontSet);
+    } else {
+        fprintf(stderr, "Failed to list fonts.\n");
+    }
+
+    // Clean up
+    FcPatternDestroy(pattern);
+    FcObjectSetDestroy(os);
+}
+
+int main() {
+    int exit_code = 1;
+    FcConfig *config = FcConfigGetCurrent();
+
+    if (!font_exist(config)) {
+        FcBool fontAddStatus = FcConfigAppFontAddFile(config, AFACAD_FONT);
+        if (fontAddStatus) {
+            fprintf(stdout, "  - allocated font-config font from `%s`\n", AFACAD_FONT);
+            if (!FcConfigSetCurrent(config)) goto exit;
+            if (!FcInitBringUptoDate()) goto exit;
+        } else {
+            fprintf(stderr, "  - [ERROR] could not load font from file `%s`\n", AFACAD_FONT);
+            goto exit;
+        }
+    }
+
+    exit_code = execvp("./ooo.my.graphs", NULL);
+
+exit:
+    FcConfigDestroy(config);
+    return exit_code;
+}

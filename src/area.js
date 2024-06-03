@@ -1,4 +1,4 @@
-/* window.js
+/* area.js
  *
  * Copyright 2023 sdf
  *
@@ -21,20 +21,17 @@
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 import Adw from 'gi://Adw';
-import GLib from 'gi://GLib';
 
-import { Sidebar } from './sidebar.js';
-import { Area } from './area.js';
+import { Mirror } from './mirror.js';
 
-export const GraphsWindow = GObject.registerClass({
-    GTypeName: 'GraphsWindow',
-    Template: 'resource:///oop/my/graphs/window.ui',
-    InternalChildren: ['sidebar-container']
-}, class GraphsWindow extends Adw.ApplicationWindow {
-    constructor(application) {
-        super({ application });
-        const sidebar = new Sidebar(this);
-        this._sidebar_container.set_child(sidebar);
+
+export const Area = GObject.registerClass({
+    GTypeName: 'Area',
+    Template: 'resource:///oop/my/graphs/area.ui',
+}, class Area extends Gtk.DrawingArea {
+    constructor() {
+        super();
+        this.mirror = new Mirror(this);
     }
 });
 

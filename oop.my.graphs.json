@@ -36,8 +36,8 @@
             "buildsystem" : "meson",
             "sources" : [
                 {
-                    "type" : "git",
-                    "url" : "file:///home/sdf/Projects"
+                    "type" : "dir",
+                    "path" : "."
                 }
             ]
         }

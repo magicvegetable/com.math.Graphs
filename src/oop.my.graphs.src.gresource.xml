@@ -4,5 +4,7 @@
     <file>main.js</file>
     <file>window.js</file>
     <file>sidebar.js</file>
+    <file>area.js</file>
+    <file>mirror.js</file>
   </gresource>
 </gresources>

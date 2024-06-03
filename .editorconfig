@@ -6,7 +6,7 @@ end_of_line = lf
 insert_final_newline = true
 
 # 4 space indentation
-[*.js]
+[*.{js,c,h,c.in}]
 indent_style = space
 charset = utf-8
 indent_size = 4

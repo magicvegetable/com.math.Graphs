@@ -31,3 +31,4 @@ configure_file(
   install: true,
   install_dir: get_option('bindir')
 )
+

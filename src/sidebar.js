@@ -22,56 +22,12 @@ import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 import Adw from 'gi://Adw';
 
-const Drag = GObject.registerClass({
-    GTypeName: 'Drag',
-}, class Drag extends GObject.Object {
-    constructor({ sidebar, window }) {
-        super();
-        this.min = this.sidebar.get_width();
-        this.sidebar = sidebar;
-        this.window = window;
-
-        const drag = new Gtk.GestureDrag();
-        drag.connect('drag-update', (undefined, x) => this.handle(x));
-        drag.connect('drag-end', (undefined, x) => this.handle(x));
-        sidebar._resize.add_controller(drag);
-    }
-
-    handle(x) {
-        const width = this.sidebar.get_width() + x;
-        if (width > this.min && width < this.window.get_width())
-            this.sidebar.width_request = width;
-    }
-
-    window = new Gtk.Window();
-    sidebar = new Gtk.Box();
-    max = 0.0;
-    min = 0.0;
-});
-
-
 export const Sidebar = GObject.registerClass({
     GTypeName: 'Sidebar',
     Template: 'resource:///oop/my/graphs/sidebar.ui',
-    InternalChildren: ['resize'],
 }, class Sidebar extends Gtk.Box {
     constructor(window) {
         super();
-        const drag = new Drag({
-            sidebar: this,
-            window
-        });
-        // const drag = new Gtk.GestureDrag();
-        //
-        // drag.connect('drag-update', (undefined, x) => this.drag_handle(x));
-        // drag.connect('drag-end', (undefined, x) => this.drag_handle(x));    
-        //
-        // this._resize.add_controller(drag);
-    }
-
-    drag_handle(x) {
-        const width = this.get_width() + x;
-        if (width > 0) this.width_request = width;
     }
 });
 

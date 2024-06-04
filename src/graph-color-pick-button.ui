@@ -5,28 +5,49 @@
   <requires lib="Gdk" version="4.0"/>
   <template class="GraphColorPickButton" parent="GtkMenuButton">
     <property name="popover">
-      <object class="GtkPopover">
+      <object class="GtkPopover" id="popover">
         <child>
-          <object class="GtkBox" id="colors">
+           <object class="GtkBox">
+            <property name="orientation">vertical</property>
             <child>
-              <object class="GraphColorButton">
-                <property name="color">blue</property>
+              <object class="GtkBox">
+                <child>
+                  <object class="GtkBox" id="colors">
+                    <child>
+                      <object class="GraphColorButton">
+                        <property name="color">blue</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GraphColorButton">
+                        <property name="color">red</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GraphColorButton">
+                        <property name="color">green</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GraphColorButton">
+                        <property name="color">yellow</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="custom-color">
+                    <property name="icon-name">plus-symbolic</property>
+                    <style>
+                      <class name="color-choose-button"/>
+                      <class name="flat"/>
+                    </style>
+                  </object>
+                </child>
               </object>
             </child>
             <child>
-              <object class="GraphColorButton">
-                <property name="color">red</property>
-              </object>
-            </child>
-            <child>
-              <object class="GraphColorButton">
-                <property name="color">green</property>
-              </object>
-            </child>
-            <child>
-              <object class="GraphColorButton">
-                <property name="color">yellow</property>
-              </object>
+               <object class="GtkBox" id="custom-colors"/>
             </child>
           </object>
         </child>

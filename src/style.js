@@ -66,19 +66,33 @@ const COLORS = {
         blue: new Color({ r: 0.1098, g: 0.4431, b: 0.8471 }),
         green: new Color({ r: 0.1059, g: 0.5216, b: 0.3255 }),
         yellow: new Color({ r: 0.8980, g: 0.6471, b: 0.0392 }),
-    }
+    },
+    custom: {}
 };
 
-// const color_from_hex = (hex) => {
-//     const r = parseFloat(hex.slice(1, 3), 16) / 255;
-//     const g = parseFloat(hex.slice(3, 5)) / 255;
-//     const b = parseFloat(hex.slice(5)) / 255;
-//     return new Color({ r, g, b });
-// }
+export const custom_colors = () => {
+    return Object.keys(COLORS.custom);
+};
 
 export const color = (name) => {
-    // if (name[0] === '#') return color_from_hex(name);
+    if (name[0] === '%') return COLORS.custom[name];
 
     if (THEME_CHECKER.dark) return COLORS.dark[name] ?? COLORS.dark.red;
     return COLORS.light[name] ?? COLORS.light.red;
+};
+
+export const register = (rgba) => {
+    const name = `%${rgba.to_string()}`;
+
+    if (COLORS.custom[name]) return name;
+
+    const color = new Color({
+        r: rgba.red,
+        g: rgba.green,
+        b: rgba.blue,
+        alpha: rgba.alpha
+    });
+    COLORS.custom[name] = color;
+
+    return name;
 };

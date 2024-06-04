@@ -118,8 +118,8 @@ export const GraphColorButton = GObject.registerClass({
 }, class GraphColorButton extends Gtk.Button {
     constructor(color) {
         super();
-        if (this.color === undefined)
-            this._color_name = color && typeof(color) === 'string' ? color : 'red'; 
+        if (this.color.length === 0)
+            this.color = (color && typeof(color) === 'string') ? color : 'red'; 
 
         const overlay = new Gtk.Overlay();
         overlay.child = new GraphColorArea(this.color);

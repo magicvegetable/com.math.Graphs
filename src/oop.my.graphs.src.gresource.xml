@@ -9,5 +9,6 @@
     <file>graph-color-button.js</file>
     <file>primitives.js</file>
     <file>mirror.js</file>
+    <file>custom-color-dialog.js</file>
   </gresource>
 </gresources>

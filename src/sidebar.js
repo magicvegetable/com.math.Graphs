@@ -21,8 +21,12 @@
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 
+import { CustomColorDialog } from './custom-color-dialog.js';
 import { MathGraph } from './mirror.js';
-import { GraphColorArea } from './graph-color-button.js';
+import { GraphColorArea, GraphColorButton } from './graph-color-button.js';
+import { custom_colors } from './style.js';
+
+const Signals = imports.signals;
 
 const random_n = n => Math.trunc(Math.random() * n);
 
@@ -99,7 +103,7 @@ const parse = (str) => {
 const GraphColorPickButton = GObject.registerClass({
     GTypeName: 'GraphColorPickButton',
     Template: 'resource:///oop/my/graphs/graph-color-pick-button.ui',
-    InternalChildren: ['colors']
+    InternalChildren: ['colors', 'custom-color', 'popover', 'custom-colors']
 }, class GraphColorPickButton extends Gtk.MenuButton {
     constructor() {
         super();
@@ -115,19 +119,90 @@ const GraphColorPickButton = GObject.registerClass({
 
         for (let i = 0; i < amount; i++) {
             const child = children.get_item(i);
-            child.connect('clicked', (_button) => {
-                this.remove_pcheck();
-                child.choosed.emit('true');
-                this.remove_pcheck = () => { child.choosed.emit('false'); }
-
-                this.child.color = child.color;
-                this.child.queue_draw();
-                if (this.graph) {
-                    this.graph.color = child.color;
-                    this.mirror.redraw();
-                }
-            });
+            this.connect_graph_button(child);
         }
+
+        for (const color of custom_colors() ?? []) {
+            this.add_custom_color(color);
+        }
+
+        this._popover.sig_ = {};
+        Signals.addSignalMethods(this._popover.sig_);
+        this._popover.sig_.connect('new-custom-color', (_popover, custom_color) => {
+            if (this.color_in_box(custom_color)) return;
+
+            for (const pick_button of GraphColorPickButton.all) {
+                const button = pick_button.add_custom_color(custom_color);
+                if (pick_button === this) pick_button.update_color(button);
+            }
+        });
+
+        this._custom_color.connect('clicked', () => {
+            this._popover.visible = false;
+            const dialog = new CustomColorDialog(this.#get_window(), this._popover);
+            dialog.present();
+        });
+
+        GraphColorPickButton.all.add(this);
+        this.connect('unmap', () => {
+            GraphColorPickButton.all.delete(this);
+        });
+    }
+
+    color_in_box(color) {
+        const children = this._custom_colors.observe_children();
+        for (let i = 0; i < children.get_n_items(); i++) {
+            const child = children.get_item(i);
+            if (child.color === color) return true;
+        }
+
+        return false;
+    }
+
+    update_color(button) {
+        this.remove_pcheck();
+        button.choosed.emit('true');
+        this.remove_pcheck = () => { button.choosed.emit('false'); }
+
+        this.child.color = button.color;
+        this.child.queue_draw();
+        if (this.graph) {
+            this.graph.color = button.color;
+            this.mirror.redraw();
+        }
+    }
+
+    add_custom_color(color) {
+        const children = this._custom_colors.observe_children();
+        if (children.get_n_items() > 4)
+            this._custom_colors.remove(children.get_item(4));
+
+        const button = new GraphColorButton(color);
+        this._custom_colors.prepend(button);
+        this.connect_graph_button(button);
+        return button;
+    }
+
+    connect_graph_button(button) {
+        button.connect('clicked', (_button) => {
+            this.remove_pcheck();
+            button.choosed.emit('true');
+            this.remove_pcheck = () => { button.choosed.emit('false'); }
+
+            this.child.color = button.color;
+            this.child.queue_draw();
+            if (this.graph) {
+                this.graph.color = button.color;
+                this.mirror.redraw();
+            }
+        });
+    }
+
+    #get_window() {
+        let parent = this.parent;
+        while (!(parent instanceof Gtk.Window))
+            parent = parent.parent;
+        return parent;
     }
 
     remove_pcheck = () => {}
@@ -140,6 +215,8 @@ const GraphColorPickButton = GObject.registerClass({
         this.graph = graph;
         graph.color = this.child.color;
     }
+
+    static all = new Set([]);
 });
 
 const Formula = GObject.registerClass({

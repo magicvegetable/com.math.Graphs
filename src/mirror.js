@@ -37,7 +37,7 @@ class Graph {
     set color(def) { this._color = def; } 
 
     apply(cr, imagine_zone, real_zone) {}
-};
+}
 
 class PointsGraph extends Graph {
     constructor({points, color} = {}) {
@@ -80,7 +80,7 @@ class PointsGraph extends Graph {
 
         cr.stroke();
     }
-};
+}
 
 export class MathGraph extends Graph {
     constructor({math_fn, color} = {}) {
@@ -262,12 +262,14 @@ class Grid {
         cr.stroke();
         cr.restore();
     }
-};
+}
 
 class Marks {
     get color() { return color('marks'); }
 
     fontd = Pango.FontDescription.from_string('Cantarell Medium 11');
+    power_fontd = Pango.FontDescription.from_string('Cantarell Medium 5');
+    max_len = 6.0;
 
     horizontal(cr, rx, rzero, str) {
         cr.save();
@@ -276,6 +278,14 @@ class Marks {
 
         cr.moveTo(rx, rzero.y);
         const layout = PangoCairo.create_layout(cr);
+
+        let nstr = '';
+        if (str.length > this.max_len) {
+            // const n = Math.abs(parseFloat(str));
+            // const main = n > 1.0 ? str.substring(0, 2);
+            console.log(str);
+            // const power = 
+        }
         layout.set_font_description(this.fontd);
 
         layout.set_text(str, str.length);
@@ -403,8 +413,6 @@ class Marks {
 
         cr.restore();
     }
-
-    max_len = 6;
 
     roffset = 3.0;
 }

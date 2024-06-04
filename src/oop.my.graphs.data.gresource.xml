@@ -8,11 +8,13 @@
     <file preprocess="xml-stripblanks">formula.ui</file>
     <file preprocess="xml-stripblanks">graph-color-pick-button.ui</file>
     <file preprocess="xml-stripblanks">graph-color-button.ui</file>
+    <file preprocess="xml-stripblanks">custom-color-dialog.ui</file>
     <file preprocess="xml-stripblanks">gtk/help-overlay.ui</file>
   </gresource>
   <gresource prefix="/oop/my/graphs/icons/scalable/actions">
     <file alias="cross-symbolic.svg" preprocess="xml-stripblanks">icons/cross-symbolic.svg</file>
     <file alias="plus-large-symbolic.svg" preprocess="xml-stripblanks">icons/plus-large-symbolic.svg</file>
+    <file alias="plus-symbolic.svg" preprocess="xml-stripblanks">icons/plus-symbolic.svg</file>
     <file alias="check-plain-symbolic.svg" preprocess="xml-stripblanks">icons/check-plain-symbolic.svg</file>
   </gresource>
 </gresources>

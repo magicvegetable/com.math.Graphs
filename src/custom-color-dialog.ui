@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.0"/>
+  <template class="CustomColorDialog" parent="AdwMessageDialog">
+    <property name="default-response">add</property>
+    <property name="close-response">cancel</property>
+    <property name="extra-child">
+      <object class="GtkColorChooserWidget" id="chooser">
+        <property name="show-editor">true</property>
+      </object>
+    </property>
+    <responses>
+      <response id="cancel" translatable="yes" appearance="destructive">Cancel</response>
+      <response id="add" translatable="yes" appearance="suggested">Add</response>
+    </responses>
+  </template>
+</interface>

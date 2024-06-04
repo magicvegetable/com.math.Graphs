@@ -8,7 +8,6 @@
       <object class="GtkPopover">
         <child>
           <object class="GtkBox" id="colors">
-            <property name="spacing">5</property>
             <child>
               <object class="GraphColorButton">
                 <property name="color">blue</property>

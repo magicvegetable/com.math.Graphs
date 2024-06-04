@@ -13,5 +13,6 @@
   <gresource prefix="/oop/my/graphs/icons/scalable/actions">
     <file alias="cross-symbolic.svg" preprocess="xml-stripblanks">icons/cross-symbolic.svg</file>
     <file alias="plus-large-symbolic.svg" preprocess="xml-stripblanks">icons/plus-large-symbolic.svg</file>
+    <file alias="check-plain-symbolic.svg" preprocess="xml-stripblanks">icons/check-plain-symbolic.svg</file>
   </gresource>
 </gresources>

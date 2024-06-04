@@ -21,14 +21,13 @@
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 
-import { COLORS, THEME_CHECKER } from './style.js';
+import { color } from './style.js';
 import { Point } from './primitives.js';
 
 const Signals = imports.signals;
 
-export const GraphColorButton = GObject.registerClass({
-    GTypeName: 'GraphColorButton',
-    Template: 'resource:///oop/my/graphs/graph-color-button.ui',
+export const GraphColorArea = GObject.registerClass({
+    GTypeName: 'GraphColorArea',
     Properties: {
         'color': GObject.ParamSpec.string(
             'color',
@@ -38,7 +37,7 @@ export const GraphColorButton = GObject.registerClass({
             'red'
         ),
     }
-}, class GraphColorButton extends Gtk.DrawingArea {
+}, class GraphColorArea extends Gtk.DrawingArea {
     constructor(color) {
         super();
         if (this.color === undefined)
@@ -46,21 +45,9 @@ export const GraphColorButton = GObject.registerClass({
         this.content_width = 30;
         this.content_height = 30;
         this.set_draw_func(this.draw_fn);
-
-        Signals.addSignalMethods(this.choosed);
-
-        const click = new Gtk.GestureClick();
-        click.connect('pressed', (_click, n, x, y) => {
-            this.choosed.emit('activate', this.color);
-        });
-        this.add_controller(click);    
     }
 
-    choosed = {};
-
-    get color() {
-        return this._color_name;
-    }
+    get color() { return this._color_name; }
 
     set color(str) {
         if (str === this._color_name) return;
@@ -69,12 +56,7 @@ export const GraphColorButton = GObject.registerClass({
         this.notify('color');
     }
 
-    get color_() {
-        if (THEME_CHECKER.dark)
-            return COLORS.dark[this.color];
-        else
-            return COLORS.light[this.color];
-    }
+    get color_() { return color(this.color); }
 
     coef = 0.15;
 
@@ -120,3 +102,52 @@ export const GraphColorButton = GObject.registerClass({
         cr.$dispose();
     }
 });
+
+export const GraphColorButton = GObject.registerClass({
+    GTypeName: 'GraphColorButton',
+    Template: 'resource:///oop/my/graphs/graph-color-button.ui',
+    Properties: {
+        'color': GObject.ParamSpec.string(
+            'color',
+            'Color',
+            'Hex color',
+            GObject.ParamFlags.READWRITE,
+            'red'
+        ),
+    }
+}, class GraphColorButton extends Gtk.Button {
+    constructor(color) {
+        super();
+        if (this.color === undefined)
+            this._color_name = color && typeof(color) === 'string' ? color : 'red'; 
+
+        const overlay = new Gtk.Overlay();
+        overlay.child = new GraphColorArea(this.color);
+        this.child = overlay;
+        this.bind_property('color', overlay.child, 'color',
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL);
+
+        Signals.addSignalMethods(this.choosed);
+        const check = Gtk.Image.new_from_icon_name('check-plain-symbolic');
+        this.choosed.connect('true', (_choosed) => {
+            overlay.add_overlay(check);
+        });
+
+        this.choosed.connect('false', (_choosed) => {
+            overlay.remove_overlay(check);
+        });
+    }
+
+    _color_name = '';
+
+    choosed = {};
+
+    get color() { return this._color_name; }
+
+    set color(str) {
+        if (str === this._color_name) return;
+
+        this._color_name = str;
+        this.notify('color');
+    }
+})

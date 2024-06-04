@@ -25,13 +25,16 @@ import Gdk from 'gi://Gdk';
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
 
-import { Color, COLORS, THEME_CHECKER } from './style.js';
+import { color } from './style.js';
 import { Point, Vector, Zone } from './primitives.js';
 
 const NO_START = new Point();
 
 class Graph {
-    color = new Color();
+    _color = 'red';
+
+    get color() { return color(this._color); }
+    set color(def) { this._color = def; } 
 
     apply(cr, imagine_zone, real_zone) {}
 };
@@ -90,17 +93,24 @@ export class MathGraph extends Graph {
 
     min = 10 ** (-10);
 
-    #find_start(izone, rzone) {
+    get_coefxy(izone, rzone) {
         const ivector = izone.vector;
         const rvector = rzone.vector;
         const coefx = ivector.x / rvector.x;
         const coefy = rvector.y / ivector.y;
+        return [coefx, coefy];
+    }
+
+    #find_start(izone, rzone) {
+        const [coefx, coefy] = this.get_coefxy(izone, rzone);
 
         let k = 1;
         let start = NO_START;
+        const math_fn = this.math_fn;
+
         for (let rx = rzone.start.x; rx < rzone.end.x; rx += k) {
             const ix = izone.start.x + coefx * (rx - rzone.start.x);
-            const iy = this.math_fn(ix);
+            const iy = math_fn(ix);
 
             if (Number.isNaN(iy) || !Number.isFinite(iy)) continue;
 
@@ -125,18 +135,16 @@ export class MathGraph extends Graph {
         this.color.apply(cr);
 
         cr.moveTo(start.x, start.y);
-        const ivector = izone.vector;
-        const rvector = rzone.vector;
-        const coefx = ivector.x / rvector.x;
-        const coefy = rvector.y / ivector.y;
+        const [coefx, coefy] = this.get_coefxy(izone, rzone);
 
         let pr = start;
         let inpr = true;
         let k = 1;
+        const math_fn = this.math_fn;
 
         for (let rx = start.x; rx < rzone.end.x; rx += k) {
             const ix = izone.start.x + coefx * (rx - rzone.start.x);
-            const iy = this.math_fn(ix);
+            const iy = math_fn(ix);
             if (Number.isNaN(iy) || !Number.isFinite(iy)) {
                 inpr = false;
                 continue;
@@ -184,38 +192,35 @@ export class MathGraph extends Graph {
 }
 
 class Axes {
-    get color() {
-        if (THEME_CHECKER.dark) return COLORS.dark.axes;
-        return COLORS.light.axes;
-    }
+    get color() { return color('axes'); }
 
-    horizontal(cr, imagine_zone, real_zone) {
-        if (!(imagine_zone.start.y <= 0 && imagine_zone.end.y >= 0)) return;
+    horizontal(cr, izone, rzone) {
+        if (!(izone.start.y <= 0 && izone.end.y >= 0)) return;
 
-        const imagine_vector = imagine_zone.vector;
-        const real_vector = real_zone.vector;
-        const coefy = real_vector.y / imagine_vector.y;
-        const zeroy = real_zone.end.y - coefy * (0 - imagine_zone.start.y)
+        const ivector = izone.vector;
+        const rvector = rzone.vector;
+        const coefy = rvector.y / ivector.y;
+        const zeroy = rzone.end.y - coefy * (0 - izone.start.y)
 
-        const startx = real_zone.start.x;
-        const endx = real_zone.end.x;
+        const startx = rzone.start.x;
+        const endx = rzone.end.x;
 
         this.color.apply(cr);
         cr.moveTo(startx, zeroy);
         cr.lineTo(endx, zeroy);
     }
 
-    vertical(cr, imagine_zone, real_zone) {
-        if (!(imagine_zone.start.x <= 0 && imagine_zone.end.x >= 0)) return;
+    vertical(cr, izone, rzone) {
+        if (!(izone.start.x <= 0 && izone.end.x >= 0)) return;
 
-        const imagine_vector = imagine_zone.vector;
-        const real_vector = real_zone.vector;
-        const coefx = real_vector.x / imagine_vector.x;
+        const ivector = izone.vector;
+        const rvector = rzone.vector;
+        const coefx = rvector.x / ivector.x;
 
-        const zerox = real_zone.start.x + coefx * (0 - imagine_zone.start.x);
+        const zerox = rzone.start.x + coefx * (0 - izone.start.x);
 
-        const starty = real_zone.start.y;
-        const endy = real_zone.end.y;
+        const starty = rzone.start.y;
+        const endy = rzone.end.y;
 
         this.color.apply(cr);
         cr.moveTo(zerox, starty);
@@ -223,9 +228,9 @@ class Axes {
     }
     
 
-    apply(cr, imagine_zone, real_zone) {
-        this.horizontal(cr, imagine_zone, real_zone);
-        this.vertical(cr, imagine_zone, real_zone);
+    apply(cr, izone, rzone) {
+        this.horizontal(cr, izone, rzone);
+        this.vertical(cr, izone, rzone);
 
         cr.stroke();
     }
@@ -234,10 +239,7 @@ class Axes {
 const PIXELS_PER_UNIT = 100.0;
 
 class Grid {
-    get color() {
-        if (THEME_CHECKER.dark) return COLORS.dark.grid;
-        return COLORS.light.grid;
-    };
+    get color() { return color('grid'); }
 
     vertical(cr, rx, rzone) {
         cr.save();
@@ -263,10 +265,7 @@ class Grid {
 };
 
 class Marks {
-    get color() {
-        if (THEME_CHECKER.dark) return COLORS.dark.marks;
-        return COLORS.light.marks;
-    };
+    get color() { return color('marks'); }
 
     fontd = Pango.FontDescription.from_string('Cantarell Medium 11');
 
@@ -557,10 +556,7 @@ class Reflection {
         this.area = area;
     }
 
-    get color() {
-        if (THEME_CHECKER.dark) return COLORS.dark.isurface;
-        return COLORS.light.isurface;
-    }
+    get color() { return color('isurface'); }
     axes = new Axes();
     zone = new Zone({
         start: new Point({

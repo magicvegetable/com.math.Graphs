@@ -21,9 +21,8 @@
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 
-import { NamedColor } from './style.js';
 import { MathGraph } from './mirror.js';
-import { GraphColorButton } from './graph-color-button.js';
+import { GraphColorArea } from './graph-color-button.js';
 
 const random_n = n => Math.trunc(Math.random() * n);
 
@@ -107,23 +106,31 @@ const GraphColorPickButton = GObject.registerClass({
         const children = this._colors.observe_children();
         const amount = children.get_n_items();
         const n = random_n(amount); 
-        const child = children.get_item(n);
-        const copy_child = new GraphColorButton(child.color);
+        const nchild = children.get_item(n);
+        nchild.choosed.emit('true');
+        this.remove_pcheck = () => { nchild.choosed.emit('false'); }
+
+        const copy_child = new GraphColorArea(nchild.color);
         this.child = copy_child;
 
         for (let i = 0; i < amount; i++) {
             const child = children.get_item(i);
-            child.choosed.connect('activate', (_choosed, color) => {
-                this.child.color = color;
+            child.connect('clicked', (_button) => {
+                this.remove_pcheck();
+                child.choosed.emit('true');
+                this.remove_pcheck = () => { child.choosed.emit('false'); }
+
+                this.child.color = child.color;
                 this.child.queue_draw();
                 if (this.graph) {
-                    this.graph.color = new NamedColor(color);
+                    this.graph.color = child.color;
                     this.mirror.redraw();
                 }
             });
         }
     }
 
+    remove_pcheck = () => {}
     graph = undefined;
     mirror = undefined;
 
@@ -131,7 +138,7 @@ const GraphColorPickButton = GObject.registerClass({
 
     connect_graph(graph) {
         this.graph = graph;
-        graph.color = new NamedColor(this.child.color);
+        graph.color = this.child.color;
     }
 });
 
@@ -146,7 +153,6 @@ const Formula = GObject.registerClass({
 
         const key_controller = new Gtk.EventControllerKey();
         key_controller.connect('key-released', () => {
-            // console.log('I am pressed');
             this.parse();
         });
         this.add_controller(key_controller);

@@ -20,10 +20,10 @@
 
 import Adw from 'gi://Adw';
 
-export const THEME_CHECKER = new Adw.StyleManager();
+const THEME_CHECKER = new Adw.StyleManager();
 
 // black default
-export class Color {
+class Color {
     constructor({ r, g, b, alpha } = {}) {
         if (r) this.r = r;
         if (g) this.g = g;
@@ -46,7 +46,7 @@ export class Color {
     }
 };
 
-export const COLORS = {
+const COLORS = {
     dark: {
         isurface: new Color({ alpha: 0.9 }),
         axes: new Color({ r: 0.8706, g: 0.8667, b: 0.8549 }),
@@ -69,16 +69,16 @@ export const COLORS = {
     }
 };
 
-export class NamedColor extends Color {
-    constructor(name) {
-        super();
-        this.name = name;
-    }
+// const color_from_hex = (hex) => {
+//     const r = parseFloat(hex.slice(1, 3), 16) / 255;
+//     const g = parseFloat(hex.slice(3, 5)) / 255;
+//     const b = parseFloat(hex.slice(5)) / 255;
+//     return new Color({ r, g, b });
+// }
 
-    apply(cr) {
-        const name = this.name;
-        const color = THEME_CHECKER.dark ?
-            COLORS.dark[name] : COLORS.light[name];
-        color.apply(cr);
-    }
+export const color = (name) => {
+    // if (name[0] === '#') return color_from_hex(name);
+
+    if (THEME_CHECKER.dark) return COLORS.dark[name] ?? COLORS.dark.red;
+    return COLORS.light[name] ?? COLORS.light.red;
 };

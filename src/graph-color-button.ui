@@ -3,8 +3,9 @@
   <requires lib="gtk" version="4.0"/>
   <requires lib="Adw" version="1.0"/>
   <requires lib="Gdk" version="4.0"/>
-  <template class="GraphColorButton" parent="GtkDrawingArea">
+  <template class="GraphColorButton" parent="GtkButton">
     <style>
+      <class name="flat"/>
       <class name="color-button"/>
     </style>
   </template>

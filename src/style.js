@@ -96,3 +96,4 @@ export const register = (rgba) => {
 
     return name;
 };
+

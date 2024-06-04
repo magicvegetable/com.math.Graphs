@@ -42,3 +42,4 @@ export const PreferencesDialog = GObject.registerClass({
         });
     }
 });
+

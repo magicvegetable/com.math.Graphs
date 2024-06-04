@@ -9,7 +9,7 @@
       <object class="AdwToolbarView">
         <child type="top">
           <object class="AdwHeaderBar" id="header_bar">
-          <child>
+            <child>
               <object class="GtkButton" id="add-formula">
                 <property name="icon-name">plus-large-symbolic</property>
               </object>
@@ -22,7 +22,7 @@
                 <property name="menu-model">primary_menu</property>
               </object>
             </child>
-              <property name="title-widget">
+            <property name="title-widget">
               <object class="GtkLabel">
                 <property name="label">Graphs</property>
                 <style>

@@ -860,3 +860,4 @@ export class Mirror {
     get draw_grid() { return this.reflection.visuals.choosed.grid; }
     set draw_grid(v) { this.reflection.visuals.choosed.grid = v; }
 };
+

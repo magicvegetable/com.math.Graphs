@@ -12,6 +12,7 @@ if desktop_utils.found()
   test('Validate desktop file', desktop_utils, args: [desktop_file])
 endif
 
+# TODO: fix this
 # appstream_file = i18n.merge_file(
 #         input: 'oop.my.graphs.metainfo.xml.in',
 #        output: 'oop.my.graphs.metainfo.xml',

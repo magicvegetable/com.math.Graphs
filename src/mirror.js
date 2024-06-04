@@ -1,4 +1,4 @@
-/* painter.js
+/* mirror.js
  *
  * Copyright 2023 sdf
  *
@@ -25,111 +25,13 @@ import Gdk from 'gi://Gdk';
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
 
-const Signals = imports.signals;
-
-const THEME_CHECKER = new Adw.StyleManager();
-
-// black default
-class Color {
-    constructor({ r, g, b, alpha } = {}) {
-        if (r) this.r = r;
-        if (g) this.g = g;
-        if (b) this.b = b;
-        if (alpha) this.alpha = alpha;
-    }
-
-    r = 0;
-    g = 0;
-    b = 0;
-    alpha = 1.0;
-
-    apply(cr) {
-        cr.setSourceRGBA(
-            this.r,
-            this.g,
-            this.b,
-            this.alpha
-        );
-    }
-};
-
-const COLORS = {
-    dark: {
-        isurface: new Color({ alpha: 0.9 }),
-        axes: new Color({ r: 0.8706, g: 0.8667, b: 0.8549 }),
-        marks: new Color({ r: 0.8706, g: 0.8667, b: 0.8549 }),
-        grid: new Color({ r: 0.4667, g: 0.4627, b: 0.4824 }),
-        red: new Color({ r: 0.7529, g: 0.1098, b: 0.1569 }),
-        blue: new Color({ r: 0.4706, g: 0.6824, b: 0.9294 }),
-        green: new Color({ r: 0.5608, g: 0.9412, b: 0.6431 }),
-        yellow: new Color({ r: 0.8039, g: 0.5765, b: 0.0353 }),
-    },
-    light: {
-        isurface: new Color({ r: 1.0, g: 1.0, b: 1.0 }),
-        axes: new Color({ r: 0.1412, g:  0.1412, b:  0.1412 }),
-        marks: new Color({ r: 0.1412, g:  0.1412, b:  0.1412 }),
-        grid: new Color({ r: 0.4667, g: 0.4627, b: 0.4824 }),
-        red: new Color({ r: 0.8784, g: 0.1059, b: 0.1412 }),
-        blue: new Color({ r: 0.1098, g: 0.4431, b: 0.8471 }),
-        green: new Color({ r: 0.1059, g: 0.5216, b: 0.3255 }),
-        yellow: new Color({ r: 0.8980, g: 0.6471, b: 0.0392 }),
-    }
-};
-
-export class NamedColor extends Color {
-    constructor(name) {
-        super();
-        this.name = name;
-    }
-
-    apply(cr) {
-        const name = this.name;
-        const color = THEME_CHECKER.dark ?
-            COLORS.dark[name] : COLORS.light[name];
-        color.apply(cr);
-    }
-};
-
-class Point {
-    constructor({ x, y } = {}) {
-        if (x) this.x = x;
-        if (y) this.y = y;
-    }
-
-    x = 0.0;
-    y = 0.0;
-}
-
-const Vector = Point;
-
-class Zone {
-    constructor({ start, end } = {}) {
-        if (start) this.start = start;
-        if (end) this.end = end;
-    }
-
-    start = new Point();
-    end = new Point();
-
-    get vector() {
-        return new Vector({
-            x: this.end.x - this.start.x,
-            y: this.end.y - this.start.y
-        });
-    }
-
-};
+import { Color, COLORS, THEME_CHECKER } from './style.js';
+import { Point, Vector, Zone } from './primitives.js';
 
 const NO_START = new Point();
 
 class Graph {
     color = new Color();
-
-    is_valid_realy(realy, real_zone) {
-        // TODO: fix this 10.0 len offsets
-        return (!Number.isNaN(realy) && Number.isFinite(realy) &&
-            realy >= real_zone.start.y - 10.0 && realy <= real_zone.end.y + 10.0);
-    }
 
     apply(cr, imagine_zone, real_zone) {}
 };
@@ -186,60 +88,94 @@ export class MathGraph extends Graph {
 
     math_fn = (x) => Math.sin(x);
 
-    #find_start(imagine_zone, real_zone) {
-        const imagine_vector = imagine_zone.vector;
-        const real_vector = real_zone.vector;
-        const coefx = imagine_vector.x / real_vector.x;
-        const coefy = real_vector.y / imagine_vector.y;
+    min = 10 ** (-10);
+
+    #find_start(izone, rzone) {
+        const ivector = izone.vector;
+        const rvector = rzone.vector;
+        const coefx = ivector.x / rvector.x;
+        const coefy = rvector.y / ivector.y;
 
         let k = 1;
         let start = NO_START;
-        for (let realx = real_zone.start.x; realx < real_zone.end.x; realx += k) {
-            const imaginex = imagine_zone.start.x + coefx * (realx - real_zone.start.x);
-            const imaginey = this.math_fn(imaginex);
-            if (Number.isNaN(imaginey) || !Number.isFinite(imaginey)) continue;
+        for (let rx = rzone.start.x; rx < rzone.end.x; rx += k) {
+            const ix = izone.start.x + coefx * (rx - rzone.start.x);
+            const iy = this.math_fn(ix);
 
-            const realy = real_zone.end.y - coefy * (imaginey - imagine_zone.start.y);
-            if (!Number.isNaN(realy) && Number.isFinite(realy)) {
-                start = new Point({ x: realx, y: realy });
-                if (start.y < real_zone.end.y && start.y > real_zone.start.y)  {
-                    realx -= k;
+            if (Number.isNaN(iy) || !Number.isFinite(iy)) continue;
+
+            const ry = rzone.end.y - coefy * (iy - izone.start.y);
+            if (!Number.isNaN(ry) && Number.isFinite(ry)) {
+                start = new Point({ x: rx, y: ry });
+                if (start.y < rzone.end.y && start.y > rzone.start.y)  {
+                    rx -= k;
                     k *= 0.1;
-                    if (k !== 0) continue;
+                    if (k > this.min) continue;
+                    return start;
                 }
-                return start;
             }
         }
 
         return NO_START;
     }
 
-    apply(cr, imagine_zone, real_zone) {
-        const start = this.#find_start(imagine_zone, real_zone);
+    apply(cr, izone, rzone) {
+        const start = this.#find_start(izone, rzone);
         if (start === NO_START) return;
         this.color.apply(cr);
 
         cr.moveTo(start.x, start.y);
-        const imagine_vector = imagine_zone.vector;
-        const real_vector = real_zone.vector;
-        const coefx = imagine_vector.x / real_vector.x;
-        const coefy = real_vector.y / imagine_vector.y;
+        const ivector = izone.vector;
+        const rvector = rzone.vector;
+        const coefx = ivector.x / rvector.x;
+        const coefy = rvector.y / ivector.y;
 
-        let prev_realy = start.y;
-        for (let realx = start.x; realx < real_zone.end.x; realx += 1) {
-            const imaginex = imagine_zone.start.x + coefx * (realx - real_zone.start.x);
-            const imaginey = this.math_fn(imaginex);
-            if (Number.isNaN(imaginey) || !Number.isFinite(imaginey)) continue;
+        let pr = start;
+        let inpr = true;
+        let k = 1;
 
-            const realy = real_zone.end.y - coefy * (imaginey - imagine_zone.start.y);
-            if (this.is_valid_realy(realy, real_zone)) {
-                cr.lineTo(realx, realy);
-                prev_realy = realy;
-            } else {
-                const rrealy = realy < 0 ? real_zone.start.y - 10.0 : real_zone.end.y + 10.0;
-                if (prev_realy * realy > 0)
-                    cr.lineTo(realx, rrealy);
-                else cr.moveTo(realx, rrealy);
+        for (let rx = start.x; rx < rzone.end.x; rx += k) {
+            const ix = izone.start.x + coefx * (rx - rzone.start.x);
+            const iy = this.math_fn(ix);
+            if (Number.isNaN(iy) || !Number.isFinite(iy)) {
+                inpr = false;
+                continue;
+            }
+
+            const ry = rzone.end.y - coefy * (iy - izone.start.y);
+            if (!Number.isNaN(ry) && Number.isFinite(ry)) {
+                if (ry > rzone.start.y && ry < rzone.end.y) {
+                    if (inpr && pr.y * ry >= 0) cr.lineTo(rx, ry);
+                    else if (pr.y * ry < 0) {
+                        cr.moveTo(rx, ry);
+                    } else {
+                        const limy = ry < rzone.start.y ? 0 : rzone.end.y;
+                        const limr = new Point({
+                            x: pr.x + (rx - pr.x) * (limy - pr.y) / (ry - pr.y),
+                            y: limy
+                        });
+                        cr.moveTo(limr.x, limr.y);
+                        cr.lineTo(rx, ry);
+                    }
+                    inpr = true;
+                } else if (inpr) {
+                    const limy = ry < rzone.start.y ? 0 : rzone.end.y;
+                    const limr = new Point({
+                        x: pr.x + (rx - pr.x) * (limy - pr.y) / (ry - pr.y),
+                        y: limy
+                    });
+                    cr.lineTo(limr.x, limr.y);
+                    inpr = false;
+                }
+                pr.x = rx;
+                pr.y = ry;
+            } else if(inpr) {
+                rx -= k;
+                k *= 0.1;
+                if (k > this.min) continue;
+                k = 1;
+                rx += k;
+                inpr = false;
             }
         }
 
@@ -332,7 +268,7 @@ class Marks {
         return COLORS.light.marks;
     };
 
-    fontd = Pango.FontDescription.from_string('Fira Code Medium 12');
+    fontd = Pango.FontDescription.from_string('Cantarell Medium 11');
 
     horizontal(cr, rx, rzero, str) {
         cr.save();
@@ -468,6 +404,8 @@ class Marks {
 
         cr.restore();
     }
+
+    max_len = 6;
 
     roffset = 3.0;
 }
@@ -617,18 +555,6 @@ class Visuals {
 class Reflection {
     constructor(area) {
         this.area = area;
-
-        const zone = new Zone({
-            start: new Point({
-                x: -2 * Math.PI,
-                y: -2,
-            }),
-            end: new Point({
-                x: 2 * Math.PI,
-                y: 2
-            })
-        });
-        this.zone = zone;
     }
 
     get color() {
@@ -636,7 +562,16 @@ class Reflection {
         return COLORS.light.isurface;
     }
     axes = new Axes();
-    zone = new Zone();
+    zone = new Zone({
+        start: new Point({
+            x: -2 * Math.PI,
+            y: -2,
+        }),
+        end: new Point({
+            x: 2 * Math.PI,
+            y: 2
+        })
+    });
     visuals = new Visuals();
 
     apply_graphs(cr, rzone) {
@@ -881,99 +816,4 @@ export class Mirror {
     delete_graph(graph) {
         this.reflection.graphs.delete(graph);
     }
-}
-
-export const GraphColorButton = GObject.registerClass({
-    GTypeName: 'GraphColorButton',
-    Template: 'resource:///oop/my/graphs/graph-color-button.ui',
-    Properties: {
-        'color': GObject.ParamSpec.string(
-            'color',
-            'Color',
-            'Hex color',
-            GObject.ParamFlags.READWRITE,
-            'red'
-        ),
-    }
-}, class GraphColorButton extends Gtk.DrawingArea {
-    constructor(color) {
-        super();
-        if (this.color === undefined)
-            this._color_name = color && typeof(color) === 'string' ? color : 'red'; 
-        this.content_width = 30;
-        this.content_height = 30;
-        this.set_draw_func(this.draw_fn);
-
-        Signals.addSignalMethods(this.choosed);
-
-        const click = new Gtk.GestureClick();
-        click.connect('pressed', (_click, n, x, y) => {
-            this.choosed.emit('activate', this.color);
-        });
-        this.add_controller(click);    
-    }
-
-    choosed = {};
-
-    get color() {
-        return this._color_name;
-    }
-
-    set color(str) {
-        if (str === this._color_name) return;
-
-        this._color_name = str;
-        this.notify('color');
-    }
-
-    get color_() {
-        if (THEME_CHECKER.dark)
-            return COLORS.dark[this.color];
-        else
-            return COLORS.light[this.color];
-    }
-
-    coef = 0.15;
-
-    draw_fn = (area, cr, width, height) => {
-        const offset = Math.sqrt(width ** 2 + height ** 2) * this.coef;
-
-        this.color_.apply(cr);
-        const top_left = new Point({ x: offset, y: 0 });
-        const top_right = new Point({ x: width - offset, y: 0 })
-        const right_top = new Point({ x: width, y: offset });
-        const right_bot = new Point({ x: width, y: height - offset });
-        const bot_right = new Point({ x: top_right.x, y: height });
-        const bot_left = new Point({ x: top_left.x, y: height });
-        const left_bot = new Point({ x: 0, y: right_bot.y });
-        const left_top = new Point({ x: 0, y: offset });
-
-        cr.curveTo(
-            top_right.x, top_right.y,
-            right_top.x, top_right.y,
-            right_top.x, right_top.y
-        );
-        cr.lineTo(right_bot.x, right_bot.y);
-        cr.curveTo(
-            right_bot.x, right_bot.y,
-            right_bot.x, bot_right.y,
-            bot_right.x, bot_right.y
-        );
-        cr.lineTo(bot_left.x, bot_left.y);
-        cr.curveTo(
-            bot_left.x, bot_left.y,
-            left_bot.x, bot_left.y,
-            left_bot.x, left_bot.y
-        );
-        cr.lineTo(left_top.x, left_top.y);
-        cr.curveTo(
-            left_top.x, left_top.y,
-            left_top.x, top_left.y,
-            top_left.x, top_left.y
-        );
-
-        cr.fill();
-
-        cr.$dispose();
-    }
-});
+};

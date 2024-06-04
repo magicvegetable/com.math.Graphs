@@ -20,14 +20,10 @@
 
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
-import Gdk from 'gi://Gdk';
-import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
-import Adw from 'gi://Adw';
 
-const Signals = imports.signals;
-
-import { GraphColorButton, MathGraph, NamedColor } from './mirror.js';
+import { NamedColor } from './style.js';
+import { MathGraph } from './mirror.js';
+import { GraphColorButton } from './graph-color-button.js';
 
 const random_n = n => Math.trunc(Math.random() * n);
 

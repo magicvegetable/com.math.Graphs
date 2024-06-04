@@ -47,7 +47,8 @@ const SYMBOLS_TO_REPLACE = {
     'log': 'Math.log10',
     'sqrt': 'Math.sqrt',
     'cbrt': 'Math.cbrt',
-    'e': 'Math.E'
+    'e': 'Math.E',
+    'pi': 'Math.PI'
 };
 
 const parse = (str) => {

@@ -64,5 +64,19 @@
         <attribute name="action">app.about</attribute>
       </item>
     </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Show Grid</attribute>
+        <attribute name="action">win.show-grid</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Show Axes</attribute>
+        <attribute name="action">win.show-axes</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Show Marks</attribute>
+        <attribute name="action">win.show-marks</attribute>
+      </item>
+    </section>
   </menu>
 </interface>

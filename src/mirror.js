@@ -146,6 +146,11 @@ export class MathGraph extends Graph {
             const ix = izone.start.x + coefx * (rx - rzone.start.x);
             const iy = math_fn(ix);
             if (Number.isNaN(iy) || !Number.isFinite(iy)) {
+                rx -= k;
+                k *= 0.1;
+                if (k > this.min) continue;
+                k = 1;
+                rx += k;
                 inpr = false;
                 continue;
             }
@@ -279,13 +284,13 @@ class Marks {
         cr.moveTo(rx, rzero.y);
         const layout = PangoCairo.create_layout(cr);
 
-        let nstr = '';
-        if (str.length > this.max_len) {
-            // const n = Math.abs(parseFloat(str));
-            // const main = n > 1.0 ? str.substring(0, 2);
-            console.log(str);
-            // const power = 
-        }
+        // let nstr = '';
+        // if (str.length > this.max_len) {
+        //     // const n = Math.abs(parseFloat(str));
+        //     // const main = n > 1.0 ? str.substring(0, 2);
+        //     console.log(str);
+        //     // const power = 
+        // }
         layout.set_font_description(this.fontd);
 
         layout.set_text(str, str.length);
@@ -537,6 +542,7 @@ class Visuals {
             for (let ix = -inew_unit.x; ix >= istart.x; ix -= inew_unit.x)
                 applyx(ix);
             if (this.choosed.marks) this.marks.zero(cr, rzero);
+            if (this.choosed.grid) this.grid.vertical(cr, rzero.x, rzone);
             for (let ix = inew_unit.x; ix <= iend.x; ix += inew_unit.x)
                 applyx(ix);
         } else {
@@ -548,6 +554,7 @@ class Visuals {
         if (istart.y < 0 && iend.y > 0) {
             for (let iy = -inew_unit.y; iy >= istart.y; iy -= inew_unit.y)
                 applyy(iy);
+            if (this.choosed.grid) this.grid.horizontal(cr, rzero.y, rzone);
             for (let iy = inew_unit.y; iy <= iend.y; iy += inew_unit.y)
                 applyy(iy);
         } else {
@@ -578,6 +585,8 @@ class Reflection {
     });
     visuals = new Visuals();
 
+    draw_axes = true;
+
     apply_graphs(cr, rzone) {
         const izone = this.zone;
         for (const graph of this.graphs)
@@ -591,7 +600,7 @@ class Reflection {
 
         this.visuals.apply(cr, this.zone, rzone);
 
-        this.axes.apply(cr, this.zone, rzone);
+        if (this.draw_axes) this.axes.apply(cr, this.zone, rzone);
 
         this.apply_graphs(cr, rzone);
 
@@ -813,11 +822,15 @@ export class Mirror {
 
     redraw() { this.reflection.area.queue_draw(); }
 
-    add_graph(graph) {
-        this.reflection.graphs.add(graph);
-    }
+    add_graph(graph) { this.reflection.graphs.add(graph); }
+    delete_graph(graph) { this.reflection.graphs.delete(graph); }
 
-    delete_graph(graph) {
-        this.reflection.graphs.delete(graph);
-    }
+    get draw_axes() { return this.reflection.draw_axes; }
+    set draw_axes(v) { this.reflection.draw_axes = v; }
+
+    get draw_marks() { return this.reflection.visuals.choosed.marks; }
+    set draw_marks(v) { this.reflection.visuals.choosed.marks = v; }
+
+    get draw_grid() { return this.reflection.visuals.choosed.grid; }
+    set draw_grid(v) { this.reflection.visuals.choosed.grid = v; }
 };

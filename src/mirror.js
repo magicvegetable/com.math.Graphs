@@ -132,7 +132,6 @@ export class MathGraph extends Graph {
         const [coefx, coefy] = this.get_coefxy(izone, rzone);
 
         let k = 1;
-        let start = NO_START;
         const math_fn = this.math_fn;
 
         for (let rx = rzone.start.x; rx < rzone.end.x; rx += k) {
@@ -178,12 +177,11 @@ export class MathGraph extends Graph {
 
             const ry = rzone.end.y - coefy * (iy - izone.start.y);
             if (!Number.isNaN(ry) && Number.isFinite(ry)) {
+                const continuous = pr.y * ry > 0;
                 if (ry > rzone.start.y && ry < rzone.end.y) {
-                    if (inpr && pr.y * ry >= 0) cr.lineTo(rx, ry);
-                    else if (pr.y * ry < 0) {
-                        cr.moveTo(rx, ry);
-                    } else {
-                         if (pr.y > rzone.end.y || pr.y < rzone.start.y) {
+                    if (inpr && continuous) cr.lineTo(rx, ry);
+                    else {
+                        if ((pr.y > rzone.end.y || pr.y < rzone.start.y) && continuous) {
                             const limy = ry < rzone.start.y ? 0 : rzone.end.y;
                             const limr = new Point({
                                 x: pr.x + (rx - pr.x) * (limy - pr.y) / (ry - pr.y),
@@ -194,6 +192,8 @@ export class MathGraph extends Graph {
                         } else {
                             const closest = this.find_closest(rzone, izone, new Point({ x: rx, y: ry }));
                             cr.moveTo(closest.x, closest.y);
+                            pr.x = closest.x;
+                            pr.y = closest.y;
                         }
                     }
                     inpr = true;

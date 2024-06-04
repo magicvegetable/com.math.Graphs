@@ -1,3 +1,7 @@
-.color-button:hover {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.15);
+.color-button {
+  padding: 3px;
+}
+
+.color-choose-button {
+  margin-left: 5px;
 }

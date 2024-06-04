@@ -3,23 +3,9 @@ project('graphs',
     meson_version: '>= 0.62.0',
   default_options: [ 'warning_level=2', 'werror=false', ],
 )
-# project(
-#   'graphs',
-#   'c',
-#   version: '0.1.0',
-#   meson_version: '>= 0.62.0',
-#   default_options: [
-#     'warning_level=2',
-#     'werror=false',
-#     'buildtype=debugoptimized',
-#     'c_std=gnu2x'
-#   ],
-# )
 
 i18n = import('i18n')
 gnome = import('gnome')
-
-
 
 subdir('data')
 subdir('src')

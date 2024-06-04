@@ -42,3 +42,4 @@ export const CustomColorDialog = GObject.registerClass({
         });
     }
 });
+

@@ -7,7 +7,7 @@
     <property name="popover">
       <object class="GtkPopover" id="popover">
         <child>
-           <object class="GtkBox">
+          <object class="GtkBox">
             <property name="orientation">vertical</property>
             <child>
               <object class="GtkBox">
@@ -47,7 +47,7 @@
               </object>
             </child>
             <child>
-               <object class="GtkBox" id="custom-colors"/>
+              <object class="GtkBox" id="custom-colors"/>
             </child>
           </object>
         </child>

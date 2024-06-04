@@ -1,0 +1,25 @@
+name: main CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: unit test
+      run: node --experimental-detect-module test/test.js
+
+    - name: run test
+      run: docker build -t graphs:test .

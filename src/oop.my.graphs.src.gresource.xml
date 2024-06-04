@@ -10,5 +10,6 @@
     <file>primitives.js</file>
     <file>mirror.js</file>
     <file>custom-color-dialog.js</file>
+    <file>parse-formula.js</file>
   </gresource>
 </gresources>

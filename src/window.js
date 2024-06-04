@@ -34,7 +34,7 @@ export const GraphsWindow = GObject.registerClass({
 }, class GraphsWindow extends Adw.ApplicationWindow {
     constructor(application) {
         super({ application });
-        
+
         const mirror = this._area.mirror;
         const sidebar = new Sidebar();
         sidebar.connect_mirror(mirror);
@@ -83,3 +83,4 @@ export const GraphsWindow = GObject.registerClass({
         this._add_formula.connect('clicked', () => sidebar.add_formula());
     }
 });
+

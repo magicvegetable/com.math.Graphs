@@ -22,6 +22,14 @@
                 <property name="menu-model">primary_menu</property>
               </object>
             </child>
+              <property name="title-widget">
+              <object class="GtkLabel">
+                <property name="label">Graphs</property>
+                <style>
+                  <class name="title"/>
+                </style>
+              </object>
+            </property>
           </object>
         </child>
         <property name="content">

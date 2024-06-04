@@ -76,6 +76,20 @@ const COLORS = {
     }
 };
 
+export class NamedColor extends Color {
+    constructor(name) {
+        super();
+        this.name = name;
+    }
+
+    apply(cr) {
+        const name = this.name;
+        const color = THEME_CHECKER.dark ?
+            COLORS.dark[name] : COLORS.light[name];
+        color.apply(cr);
+    }
+};
+
 class Point {
     constructor({ x, y } = {}) {
         if (x) this.x = x;
@@ -645,23 +659,7 @@ class Reflection {
         cr.restore();
     }
 
-    graphs = new Set([
-        new MathGraph({
-            color: new Color({ r: 0.2, g: 0.2, b: 0.6 })
-        }),
-        new MathGraph({
-            math_fn: (x) => x,
-            color: new Color({ r: 1 })
-        }),
-        new MathGraph({
-            math_fn: (x) => 1 / x,
-            color: new Color({ r: 1, b: 1 })
-        }),
-        new MathGraph({
-            math_fn: (x) => Math.cos(x),
-            color: new Color({ r: 1, g: 0.5 })
-        }),
-    ]);
+    graphs = new Set([]);
 }
 
 class Surface {
@@ -874,6 +872,8 @@ export class Mirror {
         this.reflection = reflection;
     }
 
+    redraw() { this.reflection.area.queue_draw(); }
+
     add_graph(graph) {
         this.reflection.graphs.add(graph);
     }
@@ -898,7 +898,6 @@ export const GraphColorButton = GObject.registerClass({
 }, class GraphColorButton extends Gtk.DrawingArea {
     constructor(color) {
         super();
-        print(color);
         if (this.color === undefined)
             this._color_name = color && typeof(color) === 'string' ? color : 'red'; 
         this.content_width = 30;

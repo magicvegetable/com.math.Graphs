@@ -27,9 +27,79 @@ import Adw from 'gi://Adw';
 
 const Signals = imports.signals;
 
-import { GraphColorButton, MathGraph } from './mirror.js';
+import { GraphColorButton, MathGraph, NamedColor } from './mirror.js';
 
 const random_n = n => Math.trunc(Math.random() * n);
+
+const SYMBOLS_TO_REPLACE = {
+    'atan': 'Math.atan',
+    'tan': 'Math.tan',
+    'acosh': 'Math.acosh',
+    'asinh': 'Math.asinh',
+    'acos': 'Math.acos',
+    'asin': 'Math.asin',
+    'sinh': 'Math.sinh',
+    'cosh': 'Math.cosh',
+    'sin': 'Math.sin',
+    'cos': 'Math.cos',
+    '^': '**',
+    'ln': 'Math.log',
+    'log2': 'Math.log2',
+    'log': 'Math.log10',
+    'sqrt': 'Math.sqrt',
+    'cbrt': 'Math.cbrt',
+    'e': 'Math.E'
+};
+
+const parse = (str) => {
+    const finded = {};
+
+    // find
+    for (const symbol of Object.keys(SYMBOLS_TO_REPLACE)) {
+        let id = str.indexOf(symbol);
+        if (id !== -1) {
+            finded[symbol] = new Set([]);
+            while (id !== -1) {
+                finded[symbol].add(id);
+                id = str.indexOf(symbol, id + 1);
+            }
+        }
+    }
+
+    // filter
+    for (const [s, ids] of Object.entries(finded)) {
+        for (const [ns, nids] of Object.entries(finded)) {
+            if (ns.includes(s) && ns.length > s.length) {
+                const dif = ns.indexOf(s);
+                for (const id of ids) {
+                    for (const nid of nids) {
+                        if (nid === id - dif) finded[s].delete(id);
+                    }
+                }
+            }
+        }
+    }
+
+    // replace
+    let parsed_str = '';
+    for (let i = 0; i < str.length; i++) {
+        let replaced = false;
+        for (const [s, ids] of Object.entries(finded)) {
+            for (const id of ids) {
+                if (i === id) {
+                    parsed_str += SYMBOLS_TO_REPLACE[s];
+                    i += s.length - 1;
+                    finded[s].delete(i);
+                    replaced = true;
+                    break;
+                }
+            }
+            if (replaced) break;
+        }
+        if (!replaced) parsed_str += str[i];
+    }
+    return parsed_str;
+};
 
 const GraphColorPickButton = GObject.registerClass({
     GTypeName: 'GraphColorPickButton',
@@ -50,16 +120,22 @@ const GraphColorPickButton = GObject.registerClass({
             child.choosed.connect('activate', (_choosed, color) => {
                 this.child.color = color;
                 this.child.queue_draw();
-                if (this.graph) this.graph.color = this.child.color_;
+                if (this.graph) {
+                    this.graph.color = new NamedColor(color);
+                    this.mirror.redraw();
+                }
             });
         }
     }
 
     graph = undefined;
+    mirror = undefined;
+
+    connect_mirror(mirror) { this.mirror = mirror; }
 
     connect_graph(graph) {
         this.graph = graph;
-        graph.color = this.child.color_;
+        graph.color = new NamedColor(this.child.color);
     }
 });
 
@@ -74,31 +150,31 @@ const Formula = GObject.registerClass({
 
         const key_controller = new Gtk.EventControllerKey();
         key_controller.connect('key-released', () => {
-            console.log('I ma pressed');
+            // console.log('I am pressed');
             this.parse();
-            print(this);
         });
         this.add_controller(key_controller);
 
         this.graph = new MathGraph({
             math_fn: (x) => NaN,
         });
+        this._color.connect_mirror(this.mirror);
         this._color.connect_graph(this.graph);
 
         this.mirror.add_graph(this.graph);
     }
 
     parse() {
-        const fn_str = this._label.text
-            .trim().replace(/y *=/, '');
+        const fn_str = parse(this._label.text
+            .trim().replace(/y *=/, ''));
 
         try {
             const fn = new Function('x', `return ${fn_str}`);
             const data = fn(0);
             if (typeof(data) === 'number') this.graph.math_fn = fn;
-            this.mirror.reflection.area.queue_draw();
+            this.mirror.redraw();
         } catch(e) {
-            console.log(e)
+            console.error('OOPSIE WOOPSIE!!! Uwu we made a fucky wucky...');
         }
     }
 });
@@ -113,7 +189,9 @@ export const Sidebar = GObject.registerClass({
         const id = formula._delete.connect('clicked', () => {
             formula._delete.disconnect(id);
             this._formulas.remove(formula);
-        })
+            this.mirror.delete_graph(formula.graph);
+            this.mirror.redraw();
+        });
 
         this._formulas.append(formula);
     }
@@ -122,6 +200,6 @@ export const Sidebar = GObject.registerClass({
 
     connect_mirror(mirror) {
         this.mirror = mirror;
-        this._formulas.append(new Formula(mirror));
+        this.add_formula();
     }
 });

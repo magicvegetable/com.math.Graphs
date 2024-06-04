@@ -51,6 +51,24 @@ const SYMBOLS_TO_REPLACE = {
     'pi': 'Math.PI'
 };
 
+const parse_module = str => {
+    let i = 0;
+    const parsed = str.split('').map((c) => {
+        if (c === '|') {
+            if (i % 2) {
+                i = 0;
+                return ') ** 2)'
+            } else {
+                i = 1;
+                return 'Math.sqrt((';
+            }
+        }
+        return c;
+    }).join('');
+    return parsed;
+
+};
+
 const parse = (str) => {
     const finded = {};
 
@@ -98,6 +116,9 @@ const parse = (str) => {
         }
         if (!replaced) parsed_str += str[i];
     }
+
+    parsed_str = parse_module(parsed_str);
+
     return parsed_str;
 };
 

@@ -101,6 +101,33 @@ export class MathGraph extends Graph {
         return [coefx, coefy];
     }
 
+    find_closest(rzone, izone, point) {
+        const [coefx, coefy] = this.get_coefxy(izone, rzone);
+
+        let k = 0.1;
+        const math_fn = this.math_fn;
+
+        for (let rx = point.x - 1; rx < rzone.end.x; rx += k) {
+            const ix = izone.start.x + coefx * (rx - rzone.start.x);
+            const iy = math_fn(ix);
+
+            if (Number.isNaN(iy) || !Number.isFinite(iy)) continue;
+
+            const ry = rzone.end.y - coefy * (iy - izone.start.y);
+            if (!Number.isNaN(ry) && Number.isFinite(ry)) {
+                point = new Point({ x: rx, y: ry });
+                if (point.y < rzone.end.y && point.y > rzone.start.y)  {
+                    rx -= k;
+                    k *= 0.1;
+                    if (k > this.min) continue;
+                    return point;
+                }
+            }
+        }
+
+        return point;
+    }
+
     #find_start(izone, rzone) {
         const [coefx, coefy] = this.get_coefxy(izone, rzone);
 
@@ -116,13 +143,7 @@ export class MathGraph extends Graph {
 
             const ry = rzone.end.y - coefy * (iy - izone.start.y);
             if (!Number.isNaN(ry) && Number.isFinite(ry)) {
-                start = new Point({ x: rx, y: ry });
-                if (start.y < rzone.end.y && start.y > rzone.start.y)  {
-                    rx -= k;
-                    k *= 0.1;
-                    if (k > this.min) continue;
-                    return start;
-                }
+                return this.find_closest(rzone, izone, new Point({ x: rx, y: ry }));
             }
         }
 
@@ -162,13 +183,18 @@ export class MathGraph extends Graph {
                     else if (pr.y * ry < 0) {
                         cr.moveTo(rx, ry);
                     } else {
-                        const limy = ry < rzone.start.y ? 0 : rzone.end.y;
-                        const limr = new Point({
-                            x: pr.x + (rx - pr.x) * (limy - pr.y) / (ry - pr.y),
-                            y: limy
-                        });
-                        cr.moveTo(limr.x, limr.y);
-                        cr.lineTo(rx, ry);
+                         if (pr.y > rzone.end.y || pr.y < rzone.start.y) {
+                            const limy = ry < rzone.start.y ? 0 : rzone.end.y;
+                            const limr = new Point({
+                                x: pr.x + (rx - pr.x) * (limy - pr.y) / (ry - pr.y),
+                                y: limy
+                            });
+                            cr.moveTo(limr.x, limr.y);
+                            cr.lineTo(rx, ry);
+                        } else {
+                            const closest = this.find_closest(rzone, izone, new Point({ x: rx, y: ry }));
+                            cr.moveTo(closest.x, closest.y);
+                        }
                     }
                     inpr = true;
                 } else if (inpr) {

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.0"/>
+  <requires lib="Gdk" version="4.0"/>
+  <template class="GraphColorPickButton" parent="GtkMenuButton">
+    <property name="popover">
+      <object class="GtkPopover">
+        <child>
+          <object class="GtkBox" id="colors">
+            <property name="spacing">5</property>
+            <child>
+              <object class="GraphColorButton">
+                <property name="color">blue</property>
+              </object>
+            </child>
+            <child>
+              <object class="GraphColorButton">
+                <property name="color">red</property>
+              </object>
+            </child>
+            <child>
+              <object class="GraphColorButton">
+                <property name="color">green</property>
+              </object>
+            </child>
+            <child>
+              <object class="GraphColorButton">
+                <property name="color">yellow</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+    <style>
+      <class name="flat"/>
+    </style>
+  </template>
+</interface>

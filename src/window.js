@@ -29,12 +29,16 @@ import { Area } from './area.js';
 export const GraphsWindow = GObject.registerClass({
     GTypeName: 'GraphsWindow',
     Template: 'resource:///oop/my/graphs/window.ui',
-    InternalChildren: ['sidebar-container']
+    InternalChildren: ['sidebar-container', 'add-formula', 'area']
 }, class GraphsWindow extends Adw.ApplicationWindow {
     constructor(application) {
         super({ application });
-        const sidebar = new Sidebar(this);
+        
+        const sidebar = new Sidebar();
+        sidebar.connect_mirror(this._area.mirror);
+
         this._sidebar_container.set_child(sidebar);
+
+        this._add_formula.connect('clicked', () => sidebar.add_formula())
     }
 });
-

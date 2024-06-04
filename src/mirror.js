@@ -20,9 +20,12 @@
 
 import Pango from 'gi://Pango';
 import PangoCairo from 'gi://PangoCairo';
+import GObject from 'gi://GObject';
 import Gdk from 'gi://Gdk';
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
+
+const Signals = imports.signals;
 
 const THEME_CHECKER = new Adw.StyleManager();
 
@@ -52,16 +55,24 @@ class Color {
 
 const COLORS = {
     dark: {
-        isurface: new Color({alpha: 0.9}),
-        axes: new Color({r: 0.8706, g: 0.8667, b: 0.8549}),
-        marks: new Color({r: 0.8706, g: 0.8667, b: 0.8549}),
-        grid: new Color({r: 0.4667, g: 0.4627, b: 0.4824}),
+        isurface: new Color({ alpha: 0.9 }),
+        axes: new Color({ r: 0.8706, g: 0.8667, b: 0.8549 }),
+        marks: new Color({ r: 0.8706, g: 0.8667, b: 0.8549 }),
+        grid: new Color({ r: 0.4667, g: 0.4627, b: 0.4824 }),
+        red: new Color({ r: 0.7529, g: 0.1098, b: 0.1569 }),
+        blue: new Color({ r: 0.4706, g: 0.6824, b: 0.9294 }),
+        green: new Color({ r: 0.5608, g: 0.9412, b: 0.6431 }),
+        yellow: new Color({ r: 0.8039, g: 0.5765, b: 0.0353 }),
     },
     light: {
         isurface: new Color({ r: 1.0, g: 1.0, b: 1.0 }),
         axes: new Color({ r: 0.1412, g:  0.1412, b:  0.1412 }),
         marks: new Color({ r: 0.1412, g:  0.1412, b:  0.1412 }),
-        grid: new Color({r: 0.4667, g: 0.4627, b: 0.4824}),
+        grid: new Color({ r: 0.4667, g: 0.4627, b: 0.4824 }),
+        red: new Color({ r: 0.8784, g: 0.1059, b: 0.1412 }),
+        blue: new Color({ r: 0.1098, g: 0.4431, b: 0.8471 }),
+        green: new Color({ r: 0.1059, g: 0.5216, b: 0.3255 }),
+        yellow: new Color({ r: 0.8980, g: 0.6471, b: 0.0392 }),
     }
 };
 
@@ -152,7 +163,7 @@ class PointsGraph extends Graph {
     }
 };
 
-class MathGraph extends Graph {
+export class MathGraph extends Graph {
     constructor({math_fn, color} = {}) {
         super();
         if (math_fn) this.math_fn = math_fn;
@@ -634,7 +645,7 @@ class Reflection {
         cr.restore();
     }
 
-    graphs = [
+    graphs = new Set([
         new MathGraph({
             color: new Color({ r: 0.2, g: 0.2, b: 0.6 })
         }),
@@ -650,7 +661,7 @@ class Reflection {
             math_fn: (x) => Math.cos(x),
             color: new Color({ r: 1, g: 0.5 })
         }),
-    ];
+    ]);
 }
 
 class Surface {
@@ -862,5 +873,108 @@ export class Mirror {
         this.surface = new Surface({ area, reflection });
         this.reflection = reflection;
     }
+
+    add_graph(graph) {
+        this.reflection.graphs.add(graph);
+    }
+
+    delete_graph(graph) {
+        this.reflection.graphs.delete(graph);
+    }
 }
 
+export const GraphColorButton = GObject.registerClass({
+    GTypeName: 'GraphColorButton',
+    Template: 'resource:///oop/my/graphs/graph-color-button.ui',
+    Properties: {
+        'color': GObject.ParamSpec.string(
+            'color',
+            'Color',
+            'Hex color',
+            GObject.ParamFlags.READWRITE,
+            'red'
+        ),
+    }
+}, class GraphColorButton extends Gtk.DrawingArea {
+    constructor(color) {
+        super();
+        print(color);
+        if (this.color === undefined)
+            this._color_name = color && typeof(color) === 'string' ? color : 'red'; 
+        this.content_width = 30;
+        this.content_height = 30;
+        this.set_draw_func(this.draw_fn);
+
+        Signals.addSignalMethods(this.choosed);
+
+        const click = new Gtk.GestureClick();
+        click.connect('pressed', (_click, n, x, y) => {
+            this.choosed.emit('activate', this.color);
+        });
+        this.add_controller(click);    
+    }
+
+    choosed = {};
+
+    get color() {
+        return this._color_name;
+    }
+
+    set color(str) {
+        if (str === this._color_name) return;
+
+        this._color_name = str;
+        this.notify('color');
+    }
+
+    get color_() {
+        if (THEME_CHECKER.dark)
+            return COLORS.dark[this.color];
+        else
+            return COLORS.light[this.color];
+    }
+
+    coef = 0.15;
+
+    draw_fn = (area, cr, width, height) => {
+        const offset = Math.sqrt(width ** 2 + height ** 2) * this.coef;
+
+        this.color_.apply(cr);
+        const top_left = new Point({ x: offset, y: 0 });
+        const top_right = new Point({ x: width - offset, y: 0 })
+        const right_top = new Point({ x: width, y: offset });
+        const right_bot = new Point({ x: width, y: height - offset });
+        const bot_right = new Point({ x: top_right.x, y: height });
+        const bot_left = new Point({ x: top_left.x, y: height });
+        const left_bot = new Point({ x: 0, y: right_bot.y });
+        const left_top = new Point({ x: 0, y: offset });
+
+        cr.curveTo(
+            top_right.x, top_right.y,
+            right_top.x, top_right.y,
+            right_top.x, right_top.y
+        );
+        cr.lineTo(right_bot.x, right_bot.y);
+        cr.curveTo(
+            right_bot.x, right_bot.y,
+            right_bot.x, bot_right.y,
+            bot_right.x, bot_right.y
+        );
+        cr.lineTo(bot_left.x, bot_left.y);
+        cr.curveTo(
+            bot_left.x, bot_left.y,
+            left_bot.x, bot_left.y,
+            left_bot.x, left_bot.y
+        );
+        cr.lineTo(left_top.x, left_top.y);
+        cr.curveTo(
+            left_top.x, left_top.y,
+            left_top.x, top_left.y,
+            top_left.x, top_left.y
+        );
+
+        cr.fill();
+
+        cr.$dispose();
+    }
+});

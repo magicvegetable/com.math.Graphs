@@ -3,18 +3,14 @@
   <requires lib="gtk" version="4.0"/>
   <requires lib="Adw" version="1.0"/>
   <requires lib="Gdk" version="4.0"/>
-  <template class="Sidebar" parent="GtkBox">
-    <property name="orientation">horizontal</property>
+  <template class="Sidebar" parent="GtkScrolledWindow">
+    <property name="hexpand">true</property>
+    <property name="hscrollbar-policy">never</property>
     <child>
-      <object class="GtkScrolledWindow">
+      <object class="GtkBox" id="formulas">
         <property name="hexpand">true</property>
-        <property name="hscrollbar-policy">never</property>
-        <child>
-          <object class="GtkLabel">
-            <property name="label">Hello world!</property>
-          </object>
-        </child>
-      </object>
+        <property name="orientation">vertical</property>
+     </object>
     </child>
   </template>
 </interface>

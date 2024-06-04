@@ -33,7 +33,7 @@ const random_n = n => Math.trunc(Math.random() * n);
 
 const GraphColorPickButton = GObject.registerClass({
     GTypeName: 'GraphColorPickButton',
-    Template: 'resource:///oop/my/graphs/graph-color-pick-button.ui',
+    Template: 'resource:///com/math/Graphs/graph-color-pick-button.ui',
     InternalChildren: ['colors', 'custom-color', 'popover', 'custom-colors']
 }, class GraphColorPickButton extends Gtk.MenuButton {
     constructor() {
@@ -152,7 +152,7 @@ const GraphColorPickButton = GObject.registerClass({
 
 const Formula = GObject.registerClass({
     GTypeName: 'Formula',
-    Template: 'resource:///oop/my/graphs/formula.ui',
+    Template: 'resource:///com/math/Graphs/formula.ui',
     InternalChildren: ['delete', 'label', 'color']
 }, class Formula extends Gtk.Box {
     constructor(mirror) {
@@ -191,7 +191,7 @@ const Formula = GObject.registerClass({
 
 export const Sidebar = GObject.registerClass({
     GTypeName: 'Sidebar',
-    Template: 'resource:///oop/my/graphs/sidebar.ui',
+    Template: 'resource:///com/math/Graphs/sidebar.ui',
     InternalChildren: ['formulas']
 }, class Sidebar extends Gtk.ScrolledWindow {
     add_formula() {

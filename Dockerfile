@@ -32,4 +32,4 @@ RUN meson install -C build
 
 RUN rm -rf /app
 
-CMD ["oop.my.graphs"]
+CMD ["com.math.Graphs"]

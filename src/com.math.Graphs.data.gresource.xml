@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/oop/my/graphs">
+  <gresource prefix="/com/math/Graphs">
     <file>style.css</file>
     <file preprocess="xml-stripblanks">area.ui</file>
     <file preprocess="xml-stripblanks">window.ui</file>
@@ -11,7 +11,7 @@
     <file preprocess="xml-stripblanks">custom-color-dialog.ui</file>
     <file preprocess="xml-stripblanks">gtk/help-overlay.ui</file>
   </gresource>
-  <gresource prefix="/oop/my/graphs/icons/scalable/actions">
+  <gresource prefix="/com/math/Graphs/icons/scalable/actions">
     <file alias="cross-symbolic.svg" preprocess="xml-stripblanks">icons/cross-symbolic.svg</file>
     <file alias="plus-large-symbolic.svg" preprocess="xml-stripblanks">icons/plus-large-symbolic.svg</file>
     <file alias="plus-symbolic.svg" preprocess="xml-stripblanks">icons/plus-symbolic.svg</file>

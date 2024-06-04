@@ -26,7 +26,7 @@ import { register } from './style.js';
 
 export const CustomColorDialog = GObject.registerClass({
     GTypeName: 'CustomColorDialog',
-    Template: 'resource:///oop/my/graphs/custom-color-dialog.ui',
+    Template: 'resource:///com/math/Graphs/custom-color-dialog.ui',
 }, class CustomColorDialog extends Adw.MessageDialog {
     constructor(parent, popover) {
         super({ modal: true, transient_for: parent });

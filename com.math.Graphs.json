@@ -1,13 +1,9 @@
 {
-    "app-id" : "oop.my.graphs",
+    "app-id" : "com.math.Graphs",
     "runtime" : "org.gnome.Platform",
     "runtime-version" : "master",
     "sdk" : "org.gnome.Sdk",
-    "sdk-extensions" : [
-        "org.freedesktop.Sdk.Extension.node18",
-        "org.freedesktop.Sdk.Extension.typescript"
-    ],
-    "command" : "oop.my.graphs",
+    "command" : "com.math.Graphs",
     "finish-args" : [
         "--share=network",
         "--share=ipc",
@@ -15,9 +11,6 @@
         "--device=dri",
         "--socket=wayland"
     ],
-    "build-options" : {
-        "append-path" : "/usr/lib/sdk/typescript/bin:/usr/lib/sdk/node18/bin"
-    },
     "cleanup" : [
         "/include",
         "/lib/pkgconfig",

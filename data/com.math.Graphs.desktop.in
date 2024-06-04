@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=graphs
-Exec=oop.my.graphs
-Icon=oop.my.graphs
+Exec=com.math.Graphs
+Icon=com.math.Graphs
 Terminal=false
 Type=Application
 Categories=GTK;

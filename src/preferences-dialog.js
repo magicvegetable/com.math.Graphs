@@ -26,7 +26,7 @@ import { register } from './style.js';
 
 export const PreferencesDialog = GObject.registerClass({
     GTypeName: 'PreferencesDialog',
-    Template: 'resource:///oop/my/graphs/preferences-dialog.ui',
+    Template: 'resource:///com/math/Graphs/preferences-dialog.ui',
 }, class PreferencesDialog extends Adw.MessageDialog {
     constructor(window) {
         super({ modal: true, transient_for: window });

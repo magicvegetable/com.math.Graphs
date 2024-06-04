@@ -50,13 +50,16 @@ const GraphColorPickButton = GObject.registerClass({
             child.choosed.connect('activate', (_choosed, color) => {
                 this.child.color = color;
                 this.child.queue_draw();
+                if (this.graph) this.graph.color = this.child.color_;
             });
         }
     }
 
-    get color() {
-        console.log(this.child.color_)
-        return this.child.color_;
+    graph = undefined;
+
+    connect_graph(graph) {
+        this.graph = graph;
+        graph.color = this.child.color_;
     }
 });
 
@@ -79,8 +82,9 @@ const Formula = GObject.registerClass({
 
         this.graph = new MathGraph({
             math_fn: (x) => NaN,
-            color: this._color.color
         });
+        this._color.connect_graph(this.graph);
+
         this.mirror.add_graph(this.graph);
     }
 

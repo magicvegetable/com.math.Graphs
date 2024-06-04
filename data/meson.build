@@ -1,6 +1,6 @@
 desktop_file = i18n.merge_file(
-        input: 'oop.my.graphs.desktop.in',
-       output: 'oop.my.graphs.desktop',
+        input: 'com.math.Graphs.desktop.in',
+       output: 'com.math.Graphs.desktop',
          type: 'desktop',
        po_dir: '../po',
       install: true,
@@ -14,8 +14,8 @@ endif
 
 # TODO: fix this
 # appstream_file = i18n.merge_file(
-#         input: 'oop.my.graphs.metainfo.xml.in',
-#        output: 'oop.my.graphs.metainfo.xml',
+#         input: 'com.math.Graphs.metainfo.xml.in',
+#        output: 'com.math.Graphs.metainfo.xml',
 #        po_dir: '../po',
 #       install: true,
 #   install_dir: get_option('datadir') / 'metainfo'
@@ -25,7 +25,7 @@ endif
 # test('Validate appstream file', appstreamcli,
 #      args: ['validate', '--no-net', '--explain', appstream_file])
 
-install_data('oop.my.graphs.gschema.xml',
+install_data('com.math.Graphs.gschema.xml',
   install_dir: get_option('datadir') / 'glib-2.0' / 'schemas'
 )
 

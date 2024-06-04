@@ -1,9 +1,9 @@
 {
-    "app-id" : "oop.my.graphs",
+    "app-id" : "com.math.Graphs",
     "runtime" : "org.gnome.Platform",
     "runtime-version" : "master",
     "sdk" : "org.gnome.Sdk",
-    "command" : "oop.my.graphs",
+    "command" : "com.math.Graphs",
     "finish-args" : [
         "--share=network",
         "--share=ipc",

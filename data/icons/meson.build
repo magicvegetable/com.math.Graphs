@@ -1,4 +1,4 @@
-application_id = 'oop.my.graphs'
+application_id = 'com.math.Graphs'
 
 scalable_dir = 'hicolor' / 'scalable' / 'apps'
 install_data(

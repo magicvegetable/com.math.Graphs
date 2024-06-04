@@ -31,7 +31,7 @@ pkg.initFormat();
 export const GraphsApplication = GObject.registerClass(
     class GraphsApplication extends Adw.Application {
         constructor() {
-            super({application_id: 'oop.my.graphs', flags: Gio.ApplicationFlags.DEFAULT_FLAGS});
+            super({application_id: 'com.math.Graphs', flags: Gio.ApplicationFlags.DEFAULT_FLAGS});
 
             const quit_action = new Gio.SimpleAction({name: 'quit'});
                 quit_action.connect('activate', action => {
@@ -45,13 +45,14 @@ export const GraphsApplication = GObject.registerClass(
                 let aboutParams = {
                     transient_for: this.active_window,
                     application_name: 'graphs',
-                    application_icon: 'oop.my.graphs',
-                    developer_name: 'sdf',
+                    application_icon: 'com.math.Graphs',
+                    developer_name: 'The Team',
                     version: '0.1.0',
                     developers: [
-                        'sdf'
+                        'magicvegetable',
+                        'stasyan04',
                     ],
-                    copyright: '© 2023 sdf'
+                    copyright: '© 2024 The Team'
                 };
                 const aboutWindow = new Adw.AboutWindow(aboutParams);
                 aboutWindow.present();

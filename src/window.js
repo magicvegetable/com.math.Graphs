@@ -29,7 +29,7 @@ import { Area } from './area.js';
 
 export const GraphsWindow = GObject.registerClass({
     GTypeName: 'GraphsWindow',
-    Template: 'resource:///oop/my/graphs/window.ui',
+    Template: 'resource:///com/math/Graphs/window.ui',
     InternalChildren: ['sidebar-container', 'add-formula', 'area']
 }, class GraphsWindow extends Adw.ApplicationWindow {
     constructor(application) {

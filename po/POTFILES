@@ -1,6 +1,6 @@
-data/oop.my.graphs.desktop.in
-data/oop.my.graphs.metainfo.xml.in
-data/oop.my.graphs.gschema.xml
+data/com.math.Graphs.desktop.in
+data/com.math.Graphs.metainfo.xml.in
+data/com.math.Graphs.gschema.xml
 src/main.js
 src/window.js
 src/window.ui

@@ -105,7 +105,7 @@ export const GraphColorArea = GObject.registerClass({
 
 export const GraphColorButton = GObject.registerClass({
     GTypeName: 'GraphColorButton',
-    Template: 'resource:///oop/my/graphs/graph-color-button.ui',
+    Template: 'resource:///com/math/Graphs/graph-color-button.ui',
     Properties: {
         'color': GObject.ParamSpec.string(
             'color',

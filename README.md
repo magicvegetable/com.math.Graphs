@@ -20,17 +20,17 @@ There are 2 ways:
 
 ### Flatpak
 
-    flatpak-builder build oop.my.graphs.json
-    flatpak-builder --user --install --force-clean build oop.my.graphs.json
+    flatpak-builder build com.math.Graphs.json
+    flatpak-builder --user --install --force-clean build com.math.Graphs.json
 
 ## Run
 
-Click on icon with `oop.my.graphs` name. Or, to run from the command line, use one of the following commands, depending on how the application was installed.
+Click on icon with `com.math.Graphs` name. Or, to run from the command line, use one of the following commands, depending on how the application was installed.
 ```
-flatpak run oop.my.graphs
+flatpak run com.math.Graphs
 ```
 ```
-oop.my.graphs
+com.math.Graphs
 ```
 
 ## Run tests

@@ -27,7 +27,7 @@ import { Mirror } from './mirror.js';
 
 export const Area = GObject.registerClass({
     GTypeName: 'Area',
-    Template: 'resource:///oop/my/graphs/area.ui',
+    Template: 'resource:///com/math/Graphs/area.ui',
 }, class Area extends Gtk.DrawingArea {
     constructor() {
         super();
